@@ -13,42 +13,28 @@
 #ifndef UART0_H_
 #define UART0_H_
 
-#ifndef UART0_HPP_
-#define UART0_HPP_
-
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif /* __cplusplus*/
-
-
 #include <stdint.h>
 #include <stdbool.h>
-#include <string.h>
-#include "tm4c123gh6pm.h"
-#include "gpio.h"
+#include "uart0.h"
 
 //
 // Pins and Defines
 //
 #define UART0_TX PORTA,1
 #define UART0_RX PORTA,0
-#define MAX_SUB_CHARS 80
-#define MAX_TABLE_SIZE 10
-#define QUEUE_BUFFER_LENGTH 250
+#define QUEUE_BUFFER_LENGTH 80
 
 //
 // Structure Definition
 //
-typedef struct _Uart0_Buffer
+typedef struct _UART0_BUFFER
 {
     char uart0String[QUEUE_BUFFER_LENGTH];
     uint8_t writeIndex;
     uint8_t readIndex;
-} Uart0_Buffer;
+} UART0_BUFFER;
 
-extern Uart0_Buffer uart0Info;
+extern UART0_BUFFER uart0Info;
 
 //
 // Subroutines
@@ -69,7 +55,4 @@ void sendUart0StringLiteral(const char str[]);
 void newLine(void);
 void uart0Isr(void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus*/
 #endif /* UART0_H_ */

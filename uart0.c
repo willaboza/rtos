@@ -1,4 +1,4 @@
-// uart0.cpp
+// uart0.c
 // William Bozarth
 // Created on: October 7, 2020
 
@@ -10,9 +10,14 @@
 // Target uC:       TM4C123GH6PM
 // System Clock:    40 MHz
 
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
+#include "tm4c123gh6pm.h"
+#include "gpio.h"
 #include "uart0.h"
 
-Uart0_Buffer uart0Info = {0};
+UART0_BUFFER uart0Info = {0};
 
 // Initialize UART0
 void initUart0(void)
@@ -45,8 +50,8 @@ void setUart0BaudRate(uint32_t baudRate, uint32_t fcyc)
     UART0_FBRD_R = ((divisorTimes128 + 1) >> 1) & 63;   // set fractional value to round(fract(r)*64)
     UART0_LCRH_R = UART_LCRH_WLEN_8;                    // configure for 8N1 w/ 16-level FIFO
     UART0_CTL_R  = UART_CTL_TXE | UART_CTL_RXE | UART_CTL_UARTEN; // turn-on UART0
-    UART0_IM_R = UART_IM_TXIM;                          // turn-on TX interrupt
-    NVIC_EN0_R |= 1 << (INT_UART0-16);                  // turn-on interrupt 21 (UART0)
+    UART0_IM_R   = UART_IM_TXIM;                        // turn-on TX interrupt
+    NVIC_EN0_R   |= 1 << (INT_UART0-16);                // turn-on interrupt 21 (UART0)
 }
 
 
@@ -152,53 +157,20 @@ bool fullRingBuffer(void)
     return ok;
 }
 
-// Function to Print Main Menu
+// Prints contents of main menu
 void printMainMenu(void)
 {
-    char buffer[QUEUE_BUFFER_LENGTH] = "\r\n"
-            "Commands:\r\n"
-            "  dhcp ON|OFF|REFRESH|RELEASE\r\n"
-            "  set IP|GW|DNS|SN|MQTT w.x.y.z\r\n"
-            "  ifconfig\r\n"
-            "  publish TOPIC DATA\r\n"
-            "  subscribe TOPIC\r\n"
-            "  unsubscribe TOPIC\r\n"
-            "  connect\r\n"
-            "  disconnect\r\n"
-            "  help Inputs\r\n"
-            "  help Outputs\r\n"
-            "  help Subs\r\n"
-            "  reboot\r\n\r\n";
-
-    sendUart0String(buffer); // Place contents of menu into queue
-}
-
-
-// Function to Print Help Inputs
-void printHelpInputs(void)
-{
-    char buffer[QUEUE_BUFFER_LENGTH] = "\r\n"
-            "  Local Input Topics to MQTT Client:\r\n"
-            "    env/pb\r\n"
-            "    env/temp\r\n"
-            "    env/led/green on|off\r\n"
-            "    env/led/red   on|off\r\n"
-            "    env/led/blue  on|off\r\n\r\n";
-
-    sendUart0String(buffer); // Place contents of menu into queue
-}
-
-// Function to Print Help Outputs
-void printHelpOututs(void)
-{
-    char buffer[QUEUE_BUFFER_LENGTH] = "\r\n"
-            "  Local Output Topics to MQTT Client:\r\n"
-            "    env/uart\r\n"
-            "    env/led/green STATUS\r\n"
-            "    env/led/red   STATUS\r\n"
-            "    env/led/blue  STATUS\r\n\r\n";
-
-    sendUart0String(buffer); // Place contents of menu into queue
+    sendUart0String("Commands:\r\n");
+    sendUart0String("  ps\r\n");
+    sendUart0String("  ipcs\r\n");
+    sendUart0String("  kill PID\r\n");
+    sendUart0String("  pi ON|OFF\r\n");
+    sendUart0String("  preempt ON|OFF\r\n");
+    sendUart0String("  sched PRIO|RR\r\n");
+    sendUart0String("  pidof proc_name\r\n");
+    sendUart0String("  run proc_name\r\n");
+    sendUart0String("  reboot\r\n");
+    sendUart0String("\r\n");
 }
 
 // Handle UART0 Interrupts
@@ -206,12 +178,10 @@ void uart0Isr(void)
 {
     // Writing a 1 to the bits in this register clears the bits in the UARTRIS and UARTMIS registers
     UART0_ICR_R = 0xFFF;
+
     // Check to see if UART Tx holding register is empty and send next byte of data
     if((UART0_FR_R & UART_FR_TXFE) && !(emptyRingBuffer()))
     {
         UART0_DR_R = readFromQueue();
     }
 }
-
-
-

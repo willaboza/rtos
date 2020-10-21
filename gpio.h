@@ -20,14 +20,7 @@
 #ifndef GPIO_H_
 #define GPIO_H_
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif /* __cplusplus*/
-
-#include <stdint.h>
-#include <stdbool.h>
-#include "tm4c123gh6pm.h"
+#include "gpio.h"
 
 // Enum values set to bitband address of GPIO_PORTx_DATA_R register
 typedef enum _PORT
@@ -73,7 +66,4 @@ bool getPinValue(PORT port, uint8_t pin);
 void setPortValue(PORT port, uint8_t value);
 uint8_t getPortValue(PORT port);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus*/
 #endif /* GPIO_H_ */

@@ -54,7 +54,8 @@ extern uint32_t __STACK_TOP;
 // External declarations for the interrupt handlers used by the application.
 //
 //*****************************************************************************
-// To be added by user
+extern void watchdogIsr(void);
+extern void uart0Isr(void);
 
 //*****************************************************************************
 //
@@ -88,7 +89,7 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // GPIO Port C
     IntDefaultHandler,                      // GPIO Port D
     IntDefaultHandler,                      // GPIO Port E
-    IntDefaultHandler,                      // UART0 Rx and Tx
+    uart0Isr,                               // UART0 Rx and Tx
     IntDefaultHandler,                      // UART1 Rx and Tx
     IntDefaultHandler,                      // SSI0 Rx and Tx
     IntDefaultHandler,                      // I2C0 Master and Slave
@@ -101,7 +102,7 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // ADC Sequence 1
     IntDefaultHandler,                      // ADC Sequence 2
     IntDefaultHandler,                      // ADC Sequence 3
-    IntDefaultHandler,                      // Watchdog timer
+    watchdogIsr,                            // Watchdog timer
     IntDefaultHandler,                      // Timer 0 subtimer A
     IntDefaultHandler,                      // Timer 0 subtimer B
     IntDefaultHandler,                      // Timer 1 subtimer A
