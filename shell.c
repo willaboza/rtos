@@ -21,35 +21,33 @@
 // Function to get Input from Terminal
 void getsUart0(USER_DATA* data)
 {
-    uint8_t count;
     char c;
-
-    count = data->characterCount;
 
     c = UART0_DR_R & 0xFF; // Get character
 
     UART0_ICR_R = 0xFFF; // Clear any UART0 interrupts
 
     // Determine if user input is complete
-    if((c == 13) || (count == QUEUE_BUFFER_LENGTH))
+    if((c == 13) || (data->characterCount == QUEUE_BUFFER_LENGTH))
     {
-        data->buffer[count++] = '\0';
+        data->buffer[data->characterCount++] = '\0';
         data->endOfString = true;
         sendUart0String("\r\n");
     }
-    else if ((c == 8 || c == 127) && count > 0) // Decrement count if invalid character entered
+    else if (data->characterCount > 0 && (c == 8 || c == 127)) // Decrement count if invalid character entered
     {
-        data->characterCount = --count;
+        data->characterCount--; // Decrement character count
+        sendUart0String(" \b"); // Removes character from terminal display
     }
     else if (c >= ' ' && c < 127) // Converts capital letter to lower case (if necessary)
     {
         if('A' <= c && c <= 'Z')
         {
-            data->buffer[count] = c + 32;
+            data->buffer[data->characterCount++] = c + 32;
         }
         else
         {
-            data->buffer[count] = c;
+            data->buffer[data->characterCount++] = c;
         }
     }
 }
@@ -60,12 +58,13 @@ void parseFields(USER_DATA* data)
     char    c;
     uint8_t count, fieldIndex;
 
-    count = data->characterCount;
+    count = data->characterCount - 1; // Subtract by one to get correct character count
 
     c = data->buffer[count];
 
-    // Check if at end of user input and exit function if so.
-    if(c == '\0' || count > MAX_CHARS)
+    // Check if at end of user input and exit function if so,
+    // or if backspace or delete was entered by user.
+    if(c == '\0' || count > MAX_CHARS || c == 8 || c == 127)
         return;
 
     // Get current Index for field arrays
@@ -96,10 +95,6 @@ void parseFields(USER_DATA* data)
         data->buffer[count] = '\0';
         data->delimeter = true;
     }
-
-    // Increment the count of characters entered by user
-    data->characterCount++;
-
 }
 
 // Function to Return a Token as a String
