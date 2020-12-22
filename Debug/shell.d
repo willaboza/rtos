@@ -15,10 +15,16 @@ shell.obj: C:/ti/ccs930/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/stdbool
 shell.obj: C:/ti/ccs930/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/stdlib.h
 shell.obj: C:/ti/ccs930/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/string.h
 shell.obj: C:/ti/TivaWare_C_Series-2.1.4.178/inc/tm4c123gh6pm.h
-shell.obj: ../uart0.h
-shell.obj: ../uart0.h
 shell.obj: ../shell.h
 shell.obj: ../shell.h
+shell.obj: ../uart0.h
+shell.obj: ../uart0.h
+shell.obj: ../reboot.h
+shell.obj: ../reboot.h
+shell.obj: ../rtos.h
+shell.obj: ../rtos.h
+shell.obj: ../gpio.h
+shell.obj: ../gpio.h
 
 ../shell.c: 
 C:/ti/ccs930/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/stdint.h: 
@@ -35,7 +41,13 @@ C:/ti/ccs930/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/stdbool.h:
 C:/ti/ccs930/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/stdlib.h: 
 C:/ti/ccs930/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/string.h: 
 C:/ti/TivaWare_C_Series-2.1.4.178/inc/tm4c123gh6pm.h: 
-../uart0.h: 
-../uart0.h: 
 ../shell.h: 
 ../shell.h: 
+../uart0.h: 
+../uart0.h: 
+../reboot.h: 
+../reboot.h: 
+../rtos.h: 
+../rtos.h: 
+../gpio.h: 
+../gpio.h: 

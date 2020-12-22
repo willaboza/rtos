@@ -1,4 +1,5 @@
 // main.c
+
 // William Bozarth
 // Created on: October 7, 2020
 
@@ -22,151 +23,61 @@
 #include "reboot.h"
 #include "wait.h"
 #include "rtos.h"
+#include "tasks.h"
+#include "subroutines.h"
 
-#define RED_LED PORTF,1
-#define GREEN_LED PORTF,3
-
-void initHw(void);
 
 //
 // Start of Main Function
 //
-int main(void){
+int main(void)
+{
+
+    // Declare variables
+    bool ok;
 
     // Initialize hardware
     initHw();
-    initUart0();
+    initUart0(115200, 40e6);
+    initRtos();
     // initWatchdog();
 
-    // Setup UART0 Baud Rate
-    setUart0BaudRate(115200, 40e6);
+    // Test blue LED is functioning correctly (turn on and then off)
+    setPinValue(GREEN_LED_ONBOARD, 1);
+    waitMicrosecond(250000);
+    setPinValue(GREEN_LED_ONBOARD, 0);
+    waitMicrosecond(250000);
 
-    // Declare Variables
-    USER_DATA userInput = {0};
-
-    //test green LED is functioning correctly (turn on and then off)
-    setPinValue(GREEN_LED, 1);
-    waitMicrosecond(100000);
-    setPinValue(GREEN_LED, 0);
-    waitMicrosecond(100000);
+    // testPbs(); // Used for troubleshooting LEDs and PB's
 
     //Print Main Menu
     printMainMenu();
 
-    //stay in while loop until program is exited to get next input from the terminal
-    while(true)
-    {
-        // Re-set user input
-        resetUserInput(&userInput);
+    // Initialize semaphores
+    keyPressed = createSemaphore(1);
+    keyReleased = createSemaphore(0);
+    flashReq = createSemaphore(5);
+    resource = createSemaphore(1);
 
-        // Spin until user input if complete
-        while(!userInput.endOfString)
-        {
-            // If User Input detected, then process input
-            if(kbhitUart0())
-            {
-                // Get User Input
-                getsUart0(&userInput);
+    // Add required idle process at lowest priority
+    ok =  createThread(idle, "Idle", 15, 1024);
 
-                // Tokenize User Input
-                parseFields(&userInput);
-            }
-        }
+    // Add other processes
+    ok &= createThread(lengthyFn,     "LengthyFn", 12, 1024);
+    ok &= createThread(flash4Hz,      "Flash4Hz",  8,  1024);
+    ok &= createThread(oneshot,       "OneShot",   4,  1024);
+    ok &= createThread(readKeys,      "ReadKeys",  12, 1024);
+    ok &= createThread(debounce,      "Debounce",  12, 1024);
+    ok &= createThread(important,     "Important", 0,  1024);
+    ok &= createThread(uncooperative, "Uncoop",    10, 1024);
+    ok &= createThread(errant,        "Errant",    8,  1024);
+    ok &= createThread(shell,         "Shell",     8,  1024);
 
-        // Perform Command from User Input
-        if(isCommand(&userInput, "reboot", 1))
-        {
-            rebootFlag = true; // Set flag for controller reboot
-        }
-        else if(isCommand(&userInput, "ps", 1))
-        {
-            ps();
-        }
-        else if(isCommand(&userInput, "ipcs", 1))
-        {
-            ipcs();
-        }
-        else if(isCommand(&userInput, "kill", 2))
-        {
-            int pid = getFieldInteger(&userInput, 1);
+    // Start up RTOS
+    if (ok)
+        startRtos(); // never returns
+    else
+        setPinValue(RED_LED, 1);
 
-            kill(pid);
-        }
-        else if(isCommand(&userInput, "pi", 2))
-        {
-            char buffer[10];
-
-            getFieldString(&userInput, buffer, 1);
-
-            if(strcmp(buffer, "on") == 0)
-            {
-                pi(1);
-            }
-            else if(strcmp(buffer, "off") == 0)
-            {
-                pi(0);
-            }
-        }
-        else if(isCommand(&userInput, "preempt", 2))
-        {
-            char buffer[10];
-
-            getFieldString(&userInput, buffer, 1);
-
-            if(strcmp(buffer, "on") == 0)
-            {
-                preempt(1);
-            }
-            else if(strcmp(buffer, "off") == 0)
-            {
-                preempt(0);
-            }
-        }
-        else if(isCommand(&userInput, "sched", 2))
-        {
-            char buffer[10];
-
-            getFieldString(&userInput, buffer, 1);
-
-            if(strcmp(buffer, "prio") == 0)
-            {
-                sched(1);
-            }
-            else if(strcmp(buffer, "rr") == 0)
-            {
-                sched(0);
-            }
-        }
-        else if(isCommand(&userInput, "pidof", 2)) // Configures the hardware to send an RGB triplet immediately
-        {
-            char buffer[10];
-
-            getFieldString(&userInput, buffer, 1);
-
-            pidof(buffer);
-        }
-        else if(isCommand(&userInput, "run", 2)) // Configures the hardware to send an RGB triplet when the PB is pressed
-        {
-            char buffer[10];
-
-            getFieldString(&userInput, buffer, 1);
-
-            setPinValue(RED_LED, 1);
-        }
-    }
-}
-
-// Function to Initialize System Clock
-void initHw(void)
-{
-    // Configure HW to work with 16 MHz XTAL, PLL enabled, sysdivider of 5, creating system clock of 40 MHz
-    SYSCTL_RCC_R = SYSCTL_RCC_XTAL_16MHZ | SYSCTL_RCC_OSCSRC_MAIN | SYSCTL_RCC_USESYSDIV | (4 << SYSCTL_RCC_SYSDIV_S) | SYSCTL_RCC_USEPWMDIV | SYSCTL_RCC_PWMDIV_2;
-
-    // Enable clocks
-    enablePort(PORTF);
-    _delay_cycles(3);
-
-    // Configure LED and pushbutton pins
-    selectPinPushPullOutput(RED_LED);
-    selectPinPushPullOutput(GREEN_LED);
+    return 0;
 }

@@ -15,6 +15,7 @@ gpio.obj: C:/ti/ccs930/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/stdbool.
 gpio.obj: C:/ti/TivaWare_C_Series-2.1.4.178/inc/tm4c123gh6pm.h
 gpio.obj: ../gpio.h
 gpio.obj: ../gpio.h
+gpio.obj: ../wait.h
 
 ../gpio.c: 
 C:/ti/ccs930/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/stdint.h: 
@@ -31,3 +32,4 @@ C:/ti/ccs930/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/stdbool.h:
 C:/ti/TivaWare_C_Series-2.1.4.178/inc/tm4c123gh6pm.h: 
 ../gpio.h: 
 ../gpio.h: 
+../wait.h: 

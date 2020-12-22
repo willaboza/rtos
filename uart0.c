@@ -20,14 +20,13 @@
 UART0_BUFFER uart0Info = {0};
 
 // Initialize UART0
-void initUart0(void)
+void initUart0(uint32_t baudRate, uint32_t fcyc)
 {
     // Enable clocks
     SYSCTL_RCGCUART_R |= SYSCTL_RCGCUART_R0;
     _delay_cycles(3);
 
     enablePort(PORTA);
-    _delay_cycles(3);
 
     // Configure UART0 pins
     selectPinPushPullOutput(UART0_TX);
@@ -36,8 +35,11 @@ void initUart0(void)
     setPinAuxFunction(UART0_RX, GPIO_PCTL_PA0_U0RX);
 
     // Configure UART0 with default baud rate
-    UART0_CTL_R = 0;                                    // turn-off UART0 to allow safe programming
-    UART0_CC_R  = UART_CC_CS_SYSCLK;                     // use system clock (usually 40 MHz)
+    UART0_CTL_R = 0;                 // turn-off UART0 to allow safe programming
+    UART0_CC_R  = UART_CC_CS_SYSCLK; // use system clock (usually 40 MHz)
+
+    // Setup UART0 Baud Rate
+    setUart0BaudRate(baudRate, fcyc);
 }
 
 // Set baud rate as function of instruction cycle frequency
@@ -78,8 +80,8 @@ void sendUart0String(char str[])
         // If NOT full write next Character
         if(!(fullRingBuffer()))
         {
-            writeToQueue(str[i]);
-            i++;
+            writeToQueue(str[i++]);
+            //i++;
         }
     }
 
@@ -102,8 +104,8 @@ void sendUart0StringLiteral(const char str[])
         // If NOT full write next Character
         if(!(fullRingBuffer()))
         {
-            writeToQueue(str[i]);
-            i++;
+            writeToQueue(str[i++]);
+            //i++;
         }
     }
 
@@ -134,27 +136,19 @@ char readFromQueue(void)
 // Returns true if ring buffer is EMPTY
 bool emptyRingBuffer(void)
 {
-    bool ok = false;
-
     if(uart0Info.writeIndex == uart0Info.readIndex)
-    {
-        ok = true;
-    }
+        return true;
 
-    return ok;
+    return false;
 }
 
 // Returns true if ring buffer is FULL
 bool fullRingBuffer(void)
 {
-    bool ok = false;
-
     if(((uart0Info.writeIndex + 1) % QUEUE_BUFFER_LENGTH) == uart0Info.readIndex)
-    {
-        ok = true;
-    }
+        return true;
 
-    return ok;
+    return false;
 }
 
 // Prints contents of main menu

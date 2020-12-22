@@ -11,12 +11,15 @@ GEN_CMDS__FLAG :=
 
 ORDERED_OBJS += \
 "./gpio.obj" \
+"./interrupts.obj" \
 "./main.obj" \
 "./pwm0.obj" \
 "./reboot.obj" \
 "./rtos.obj" \
 "./shell.obj" \
 "./startup.obj" \
+"./subroutines.obj" \
+"./tasks.obj" \
 "./uart0.obj" \
 "./wait.obj" \
 "../tm4c123gh6pm.cmd" \
@@ -162,8 +165,8 @@ rtos.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "gpio.obj" "main.obj" "pwm0.obj" "reboot.obj" "rtos.obj" "shell.obj" "startup.obj" "uart0.obj" "wait.obj" 
-	-$(RM) "gpio.d" "main.d" "pwm0.d" "reboot.d" "rtos.d" "shell.d" "startup.d" "uart0.d" "wait.d" 
+	-$(RM) "gpio.obj" "interrupts.obj" "main.obj" "pwm0.obj" "reboot.obj" "rtos.obj" "shell.obj" "startup.obj" "subroutines.obj" "tasks.obj" "uart0.obj" "wait.obj" 
+	-$(RM) "gpio.d" "interrupts.d" "main.d" "pwm0.d" "reboot.d" "rtos.d" "shell.d" "startup.d" "subroutines.d" "tasks.d" "uart0.d" "wait.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

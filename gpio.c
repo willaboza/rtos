@@ -1,5 +1,7 @@
-// GPIO Library
-// Jason Losh
+// gpio.c
+
+// William Bozarth
+// Created on: October 7, 2020
 
 //-----------------------------------------------------------------------------
 // Hardware Target
@@ -20,6 +22,7 @@
 #include <stdbool.h>
 #include "tm4c123gh6pm.h"
 #include "gpio.h"
+#include "wait.h"
 
 #define OFS_DATA_TO_DIR    1*4*8
 #define OFS_DATA_TO_IS     2*4*8
@@ -121,6 +124,8 @@ void selectPinDigitalInput(PORT port, uint8_t pin)
     *p = 1;
     p = (uint32_t*)port + pin + OFS_DATA_TO_AMSEL;
     *p = 0;
+    p = (uint32_t*)port + pin + OFS_DATA_TO_PDR;
+    *p = 1;
 }
 
 void selectPinAnalogInput(PORT port, uint8_t pin)
@@ -292,6 +297,14 @@ void setPinValue(PORT port, uint8_t pin, bool value)
     *p = value;
 }
 
+void togglePinValue(PORT port, uint8_t pin)
+{
+    uint32_t* p;
+    p = (uint32_t*)port + pin;
+    *p ^= 1;
+}
+
+
 bool getPinValue(PORT port, uint8_t pin)
 {
     uint32_t* p;
@@ -347,4 +360,15 @@ uint8_t getPortValue(PORT port)
             value = GPIO_PORTF_DATA_R;
     }
     return value;
+}
+
+// Blocking function that returns only when PB is pressed
+void waitPbPress(PORT port1, uint8_t pin1, PORT port2, uint8_t pin2)
+{
+    //wait until push button pressed
+    while(getPinValue(port1, pin1) != 1);
+
+    setPinValue(port2, pin2, 1);
+    waitMicrosecond(1000000);
+    setPinValue(port2, pin2, 0);
 }
