@@ -22,27 +22,30 @@
 #define MAX_FIELDS 5
 
 //
-// Structure Definition
+// Structure Definitions
 //
 typedef struct _USER_DATA
 {
     bool    delimeter;
     bool    endOfString;
     uint8_t fieldCount;
+    uint8_t startCount;
     uint8_t characterCount;
     uint8_t fieldPosition[MAX_FIELDS];
     char    fieldType[MAX_FIELDS];
-    char    buffer[MAX_CHARS + 1];
+    char    buffer[MAX_CHARS];
 } USER_DATA;
+
+extern USER_DATA userInput;
 
 //
 // Definitions
 //
-void getsUart0(USER_DATA* data);
+bool getsUart0(USER_DATA* data);
 void parseFields(USER_DATA* data);
-void resetUserInput(USER_DATA* data);
-bool isCommand(USER_DATA* data, const char strCommand[], uint8_t minArguments);
-void getFieldString(USER_DATA* data, char fieldString[], uint8_t fieldNumber);
-int32_t getFieldInteger(USER_DATA* data, uint8_t fieldNumber);
+bool isCommand(USER_DATA** data, const char strCommand[], uint8_t minArguments);
+void getFieldString(USER_DATA** data, char fieldString[], uint8_t fieldNumber);
+int32_t getFieldInteger(USER_DATA** data, uint8_t fieldNumber);
+void shellCommands(USER_DATA* userInput);
 
 #endif /* SHELL_H_ */

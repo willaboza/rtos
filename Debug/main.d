@@ -28,6 +28,10 @@ main.obj: ../reboot.h
 main.obj: ../wait.h
 main.obj: ../rtos.h
 main.obj: ../rtos.h
+main.obj: ../tasks.h
+main.obj: ../tasks.h
+main.obj: ../subroutines.h
+main.obj: ../subroutines.h
 
 ../main.c: 
 C:/ti/ccs930/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/stdint.h: 
@@ -57,3 +61,7 @@ C:/ti/TivaWare_C_Series-2.1.4.178/inc/tm4c123gh6pm.h:
 ../wait.h: 
 ../rtos.h: 
 ../rtos.h: 
+../tasks.h: 
+../tasks.h: 
+../subroutines.h: 
+../subroutines.h: 

@@ -10,6 +10,11 @@
 // Target uC:       TM4C123GH6PM
 // System Clock:    40 MHz
 
+// UART Interface:
+//   U0TX (PA1) and U0RX (PA0) are connected to the 2nd controller
+//   The USB on the 2nd controller enumerates to an ICDI interface and a virtual COM port
+//   Configured to 115,200 baud, 8N1
+
 #ifndef UART0_H_
 #define UART0_H_
 
@@ -43,7 +48,7 @@ void setUart0BaudRate(uint32_t baudRate, uint32_t fcyc);
 void writeToQueue(char c);
 bool kbhitUart0(void);
 char getcUart0(void);
-void initUart0(void);
+void initUart0(uint32_t baudRate, uint32_t fcyc);
 char readFromQueue(void);
 bool emptyRingBuffer(void);
 bool fullRingBuffer(void);
